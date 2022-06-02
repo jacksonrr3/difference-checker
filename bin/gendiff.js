@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
-import genDiff from '../src/index.js';
+import { genDiff, printDiff } from '../src/index.js';
 
 program
   .name('gendiff')
@@ -11,7 +11,7 @@ program
   .option('-f, --format <type>',  'output format')
   .action((file1, file2) => {
     const result = genDiff(file1, file2);
-    console.log(`genDiff result: ${result}.`);
+    printDiff(result);
   });
 
 program.parse();
