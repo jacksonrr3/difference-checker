@@ -34,7 +34,4 @@ jobs:
     - run: make install
     - uses: paambaati/codeclimate-action@v2.2.4
       env:
-        CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_ID }}
-      with:
-        coverageCommand: make test-coverage
-
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
