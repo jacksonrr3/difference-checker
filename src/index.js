@@ -8,17 +8,13 @@ const getObjectFromJSON = (filePath) =>
   JSON.parse(fs.readFileSync(filePath));
 
 export const printDiff = (diffs) => { 
-  console.log('{');
-  diffs.forEach(diff => {
-    console.log(`  ${diff}`);
-  });
-  console.log('}');
+  const toPrint = diffs.map(diff => `  ${diff}\n`);
+  console.log(`{\n${toPrint.join('')}\n}`);
 };  
 
 export const genDiff = (pathTofile1, pathTofile2) => {
   const firstComparedObj = getObjectFromJSON(normalizePath(pathTofile1));
   const secondComparedObj = getObjectFromJSON(normalizePath(pathTofile2));
-
   const agregatedKeys = _.union(_.keys(firstComparedObj), _.keys(secondComparedObj));
   
   const diffObject = _.sortBy(agregatedKeys).reduce((acc, key) => { 
