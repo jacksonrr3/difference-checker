@@ -37,14 +37,12 @@ export const genDiff = (pathTofile1, pathTofile2) => {
   );
 
   return _.sortBy(agregatedKeys).reduce((acc, key) => {
-    const isContainedByFirst = Object.hasOwn(firstComparedObj, key);
-    const isContainedBySecond = Object.hasOwn(secondComparedObj, key);
     const firstValue = firstComparedObj[key];
     const secondValue = secondComparedObj[key];
-    if (isContainedByFirst && !isContainedBySecond) {
+    if (secondValue === undefined) {
       return [...acc, `- ${key}: ${firstValue}`];
     }
-    if (!isContainedByFirst && isContainedBySecond) {
+    if (firstValue === undefined) {
       return [...acc, `+ ${key}: ${secondValue}`];
     }
     if (firstValue !== secondValue) {
