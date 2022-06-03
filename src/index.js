@@ -7,8 +7,8 @@ const normalizePath = (filePath) => path.resolve(process.cwd(), filePath);
 const getObjectFromJSON = (filePath) => JSON.parse(fs.readFileSync(filePath));
 
 export const printDiff = (diffs) => {
-  const toPrint = diffs.map((diff) => `  ${diff}\n`);
-  console.log(`{\n${toPrint.join('')}\n}`);
+  const toPrint = diffs.map((diff) => `  ${diff}`);
+  console.log(`{\n${toPrint.join('\n')}\n}`);
 };
 
 export const genDiff = (pathTofile1, pathTofile2) => {
@@ -19,7 +19,7 @@ export const genDiff = (pathTofile1, pathTofile2) => {
     _.keys(secondComparedObj),
   );
 
-  const diffObject = _.sortBy(agregatedKeys).reduce((acc, key) => {
+  const diffs = _.sortBy(agregatedKeys).reduce((acc, key) => {
     const isContainedByFirst = Object.hasOwn(firstComparedObj, key);
     const isContainedBySecond = Object.hasOwn(secondComparedObj, key);
     const firstValue = firstComparedObj[key];
@@ -41,7 +41,7 @@ export const genDiff = (pathTofile1, pathTofile2) => {
     return acc;
   }, []);
 
-  return diffObject;
+  return diffs;
 };
 
 export default {
