@@ -8,10 +8,10 @@ lint-fix:
 	npx eslint . --fix
 
 test:
-	NODE_OPTIONS=--experimental-vm-modules npx jest
+	npm test
 
 test-watch:
 	NODE_OPTIONS=--experimental-vm-modules npx jest --watchAll
 
 test-coverage:
-	NODE_OPTIONS=--experimental-vm-modules npx jest --coverage --coverageProvider=v8
+	npm test -- --coverage --coverageProvider=v8
