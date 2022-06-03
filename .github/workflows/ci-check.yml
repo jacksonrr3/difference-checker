@@ -3,7 +3,7 @@ name: CI checks
 on: [push, pull_request]
 
 jobs:
-  lint:
+  lint and test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -13,3 +13,4 @@ jobs:
           node-version: 16
       - run: npm ci
       - run: make lint
+      - run: make test
