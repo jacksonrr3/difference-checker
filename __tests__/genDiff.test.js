@@ -7,14 +7,14 @@ const __dirname = dirname(__filename);
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 
-const plainResult = [
-  '- follow: false',
-  '  host: hexlet.io',
-  '- proxy: 123.234.53.22',
-  '- timeout: 50',
-  '+ timeout: 20',
-  '+ verbose: true',
-];
+const plainResult = `{
+  - follow: false
+    host: hexlet.io
+  - proxy: 123.234.53.22
+  - timeout: 50
+  + timeout: 20
+  + verbose: true
+}`;
 
 test('genDiff compare plain JSON files', () => {
   const firstFilePath = getFixturePath('test1_1.json');

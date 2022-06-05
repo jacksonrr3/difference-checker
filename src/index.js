@@ -1,43 +1,40 @@
 import _ from 'lodash';
 import fileUtils from './file_utils.js';
+import formatter from './formatter/index.js';
 
-export const printDiff = (diffs) => {
-  const toPrint = diffs.map((diff) => `  ${diff}`);
-  console.log(`{\n${toPrint.join('\n')}\n}`);
-};
-
-const createDiffObject = (firstObject, secondObject) => {
+const createDiffCol = (firstObject, secondObject) => {
   const agregatedKeys = _.union(_.keys(firstObject), _.keys(secondObject));
 
   return _.sortBy(agregatedKeys)
-    .reduce((acc, key) => {
+    .map((key) => {
       const firstValue = firstObject[key];
       const secondValue = secondObject[key];
       if (secondValue === undefined) {
-        return [...acc, `- ${key}: ${firstValue}`];
+        return { key, type: 'remove', oldValue: firstValue };
       }
       if (firstValue === undefined) {
-        return [...acc, `+ ${key}: ${secondValue}`];
+        return { key, type: 'add', value: secondValue };
       }
-      if (firstValue !== secondValue) {
-        return [...acc, `- ${key}: ${firstValue}`, `+ ${key}: ${secondValue}`];
+      if (firstValue === secondValue) {
+        return { key, type: 'same', value: firstValue };
       }
-      return [...acc, `  ${key}: ${firstValue}`];
-    }, []);
+      return {
+        key, type: 'changed', oldValue: firstValue, value: secondValue,
+      };
+    });
 };
 
-export const genDiff = (pathTofile1, pathTofile2) => {
+export const genDiff = (pathTofile1, pathTofile2, format) => {
   const firstComparedObj = fileUtils.getObjectFromFile(pathTofile1);
   const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
-  const diffObject = createDiffObject(firstComparedObj, secondComparedObj);
+  const differences = createDiffCol(firstComparedObj, secondComparedObj);
 
-  printDiff(diffObject);
-
-  return diffObject;
+  const resultString = formatter.formatToString(differences, format);
+  console.log(resultString);
+  return resultString;
 };
 
 export default {
   genDiff,
-  printDiff,
 };
