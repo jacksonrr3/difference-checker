@@ -9,15 +9,23 @@ const createDiffCol = (firstObject, secondObject) => {
     .map((key) => {
       const firstValue = firstObject[key];
       const secondValue = secondObject[key];
+
       if (secondValue === undefined) {
         return { key, type: 'remove', oldValue: firstValue };
       }
+
       if (firstValue === undefined) {
         return { key, type: 'add', value: secondValue };
       }
+
       if (firstValue === secondValue) {
         return { key, type: 'same', value: firstValue };
       }
+
+      if (_.isObject(firstValue) && _.isObject(secondValue)) {
+        return { key, type: 'nested', children: createDiffCol(firstValue, secondValue) };
+      }
+
       return {
         key, type: 'changed', oldValue: firstValue, value: secondValue,
       };
@@ -29,9 +37,9 @@ export const genDiff = (pathTofile1, pathTofile2, format) => {
   const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
   const differences = createDiffCol(firstComparedObj, secondComparedObj);
-
+  // console.log(differences);
   const resultString = formatter.formatToString(differences, format);
-  console.log(resultString);
+  // console.log(resultString);
   return resultString;
 };
 

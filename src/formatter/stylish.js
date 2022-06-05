@@ -1,50 +1,55 @@
-// import _ from 'lodash';
+import _ from 'lodash';
 
-// const convertObjToString = (obj, replacer = ' ', replaceCount = 1) => {
-//   const iter = (data, step) => {
-//     if (!_.isObject(data)) return `${data}`;
+const replacer = ' ';
+const replaceCount = 4;
 
-//     const bracketInner = replacer.repeat(replaceCount * (step - 1));
-//     const currentInner = replacer.repeat(replaceCount * step);
+const convertObjToString = (obj, startInner = '') => {
+  const iter = (data, step) => {
+    if (!_.isObject(data)) return `${data}`;
 
-//     const lines = Object
-//       .entries(data)
-//       .flatMap(([key, value]) => `${currentInner}${key}: ${iter(value, step + 1)}`);
+    const bracketInner = `${startInner}${replacer.repeat(
+      replaceCount * (step - 1)
+    )}`;
+    const currentInner = `${startInner}${replacer.repeat(replaceCount * step)}`;
 
-//     return [
-//       '{',
-//       ...lines,
-//       `${bracketInner}}`,
-//     ];
-//   };
+    const lines = Object.entries(data).flatMap(
+      ([key, value]) => `${currentInner}${key}: ${iter(value, step + 1)}`
+    );
 
-//   return iter(obj, 1).join('\n');
-// };
+    return ['{', ...lines, `${bracketInner}}`].join('\n');
+  };
 
-const colToString = (collection, replacer = ' ', replaceCount = 2) => {
+  return iter(obj, 1);
+};
+
+const colToString = (collection) => {
   const iter = (col, step) => {
-    const bracketInner = replacer.repeat(replaceCount * (step - 1));
-    const currentInner = replacer.repeat(replaceCount * step);
-    const result = collection.flatMap((el) => {
-      const {
-        key, type, value, oldValue,
-      } = el;
+    const bracketIndent = `${replacer.repeat(replaceCount * (step - 1))}`;
+    const indent = replacer.repeat(replaceCount * step);
+    const opIndent = indent.slice(0, -2);
+
+    const result = col.flatMap((el) => {
+      const { key, type, value, oldValue, children } = el;
       if (type === 'remove') {
-        return `${currentInner}- ${key}: ${oldValue}`;
+        return `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`;
       }
       if (type === 'add') {
-        return `${currentInner}+ ${key}: ${value}`;
+        return `${opIndent}+ ${key}: ${convertObjToString(value, indent)}`;
       }
       if (type === 'changed') {
         return [
-          `${currentInner}- ${key}: ${oldValue}`,
-          `${currentInner}+ ${key}: ${value}`,
+          `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`,
+          `${opIndent}+ ${key}: ${convertObjToString(value, indent)}`,
         ];
       }
-      return `${currentInner}  ${key}: ${value}`;
+      if (type === 'nested') {
+        return `${indent}${key}: ${iter(children, step + 1)}`;
+      }
+
+      return `${indent}${key}: ${convertObjToString(value, indent)}`;
     });
 
-    return ['{', ...result, `${bracketInner}}`].join('\n');
+    return ['{', ...result, `${bracketIndent}}`].join('\n');
   };
 
   return iter(collection, 1);
