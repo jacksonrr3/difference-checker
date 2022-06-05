@@ -37,9 +37,9 @@ export const genDiff = (pathTofile1, pathTofile2, format) => {
   const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
   const differences = createDiffCol(firstComparedObj, secondComparedObj);
-  // console.log(differences);
+
   const resultString = formatter.formatToString(differences, format);
-  // console.log(resultString);
+
   return resultString;
 };
 

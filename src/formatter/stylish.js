@@ -8,12 +8,12 @@ const convertObjToString = (obj, startInner = '') => {
     if (!_.isObject(data)) return `${data}`;
 
     const bracketInner = `${startInner}${replacer.repeat(
-      replaceCount * (step - 1)
+      replaceCount * (step - 1),
     )}`;
     const currentInner = `${startInner}${replacer.repeat(replaceCount * step)}`;
 
     const lines = Object.entries(data).flatMap(
-      ([key, value]) => `${currentInner}${key}: ${iter(value, step + 1)}`
+      ([key, value]) => `${currentInner}${key}: ${iter(value, step + 1)}`,
     );
 
     return ['{', ...lines, `${bracketInner}}`].join('\n');
@@ -28,8 +28,9 @@ const colToString = (collection) => {
     const indent = replacer.repeat(replaceCount * step);
     const opIndent = indent.slice(0, -2);
 
-    const result = col.flatMap((el) => {
-      const { key, type, value, oldValue, children } = el;
+    const result = col.flatMap(({
+      key, type, value, oldValue, children,
+    }) => {
       if (type === 'remove') {
         return `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`;
       }
