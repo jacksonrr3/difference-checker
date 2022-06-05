@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import fileUtils from './file_utils.js';
-import formatter from './formatter/index.js';
+import formatter from './formatters/index.js';
 
 const createDiffCol = (firstObject, secondObject) => {
   const agregatedKeys = _.union(_.keys(firstObject), _.keys(secondObject));
@@ -10,18 +10,9 @@ const createDiffCol = (firstObject, secondObject) => {
       const firstValue = firstObject[key];
       const secondValue = secondObject[key];
 
-      if (secondValue === undefined) {
-        return { key, type: 'remove', oldValue: firstValue };
-      }
-
-      if (firstValue === undefined) {
-        return { key, type: 'add', value: secondValue };
-      }
-
-      if (firstValue === secondValue) {
-        return { key, type: 'same', value: firstValue };
-      }
-
+      if (secondValue === undefined) return { key, type: 'removed', oldValue: firstValue };
+      if (firstValue === undefined) return { key, type: 'added', value: secondValue };
+      if (firstValue === secondValue) return { key, type: 'unchanged', value: firstValue };
       if (_.isObject(firstValue) && _.isObject(secondValue)) {
         return { key, type: 'nested', children: createDiffCol(firstValue, secondValue) };
       }
@@ -32,15 +23,12 @@ const createDiffCol = (firstObject, secondObject) => {
     });
 };
 
-export const genDiff = (pathTofile1, pathTofile2, format) => {
+export const genDiff = (pathTofile1, pathTofile2, formatName) => {
   const firstComparedObj = fileUtils.getObjectFromFile(pathTofile1);
   const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
   const differences = createDiffCol(firstComparedObj, secondComparedObj);
-
-  const resultString = formatter.formatToString(differences, format);
-
-  return resultString;
+  return formatter.formatToString(differences, formatName);
 };
 
 export default {
