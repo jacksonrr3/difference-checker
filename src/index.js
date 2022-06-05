@@ -1,58 +1,48 @@
-import fs from 'fs';
-import path from 'path';
 import _ from 'lodash';
-import yaml from 'js-yaml';
+import fileUtils from './file_utils.js';
+import formatter from './formatter/index.js';
 
-const normalizePath = (filePath) => path.resolve(process.cwd(), filePath);
+const createDiffCol = (firstObject, secondObject) => {
+  const agregatedKeys = _.union(_.keys(firstObject), _.keys(secondObject));
 
-const getObjectFromJSON = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return _.sortBy(agregatedKeys)
+    .map((key) => {
+      const firstValue = firstObject[key];
+      const secondValue = secondObject[key];
 
-const getObjectFromYAML = (filePath) => yaml.load(fs.readFileSync(filePath, 'utf8'));
+      if (secondValue === undefined) {
+        return { key, type: 'remove', oldValue: firstValue };
+      }
 
-const getObjectFromFile = (filePath) => {
-  const ext = path.extname(filePath);
+      if (firstValue === undefined) {
+        return { key, type: 'add', value: secondValue };
+      }
 
-  if (ext === '.yml' || ext === '.yaml') {
-    return getObjectFromYAML(filePath);
-  }
+      if (firstValue === secondValue) {
+        return { key, type: 'same', value: firstValue };
+      }
 
-  if (ext === '.json') {
-    return getObjectFromJSON(filePath);
-  }
+      if (_.isObject(firstValue) && _.isObject(secondValue)) {
+        return { key, type: 'nested', children: createDiffCol(firstValue, secondValue) };
+      }
 
-  throw new Error('Undefined file format.');
+      return {
+        key, type: 'changed', oldValue: firstValue, value: secondValue,
+      };
+    });
 };
 
-export const printDiff = (diffs) => {
-  const toPrint = diffs.map((diff) => `  ${diff}`);
-  console.log(`{\n${toPrint.join('\n')}\n}`);
-};
+export const genDiff = (pathTofile1, pathTofile2, format) => {
+  const firstComparedObj = fileUtils.getObjectFromFile(pathTofile1);
+  const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
-export const genDiff = (pathTofile1, pathTofile2) => {
-  const firstComparedObj = getObjectFromFile(normalizePath(pathTofile1));
-  const secondComparedObj = getObjectFromFile(normalizePath(pathTofile2));
-  const agregatedKeys = _.union(
-    _.keys(firstComparedObj),
-    _.keys(secondComparedObj),
-  );
+  const differences = createDiffCol(firstComparedObj, secondComparedObj);
 
-  return _.sortBy(agregatedKeys).reduce((acc, key) => {
-    const firstValue = firstComparedObj[key];
-    const secondValue = secondComparedObj[key];
-    if (secondValue === undefined) {
-      return [...acc, `- ${key}: ${firstValue}`];
-    }
-    if (firstValue === undefined) {
-      return [...acc, `+ ${key}: ${secondValue}`];
-    }
-    if (firstValue !== secondValue) {
-      return [...acc, `- ${key}: ${firstValue}`, `+ ${key}: ${secondValue}`];
-    }
-    return [...acc, `  ${key}: ${firstValue}`];
-  }, []);
+  const resultString = formatter.formatToString(differences, format);
+
+  return resultString;
 };
 
 export default {
   genDiff,
-  printDiff,
 };
