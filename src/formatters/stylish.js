@@ -31,7 +31,7 @@ const convertObjToString = (obj, startIndent = '') => {
   return iter(obj, 1);
 };
 
-const colToString = (collection) => {
+const collectionToString = (collection) => {
   const iter = (col, step) => {
     const { bracketIndent, indent, opIndent } = createIndents(step);
 
@@ -57,5 +57,5 @@ const colToString = (collection) => {
 };
 
 export default {
-  colToString,
+  collectionToString,
 };
