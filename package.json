@@ -2,9 +2,11 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/jacksonrr3/frontend-project-lvl2/workflows/hexlet-check/badge.svg)](https://github.com/jacksonrr3/frontend-project-lvl2/actions)",
-  "main": "src/index.js",
+  "main": "index.js",
   "type": "module",
-  "bin": {},
+  "bin": {
+    "gen-diff": "bin/gendiff.js"
+  },
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
