@@ -26,7 +26,7 @@ const createDiffCol = (firstObject, secondObject) => {
     });
 };
 
-export default (pathTofile1, pathTofile2, formatName) => {
+const genDiff = (pathTofile1, pathTofile2, formatName) => {
   const firstComparedObj = fileUtils.getObjectFromFile(pathTofile1);
   const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
@@ -34,3 +34,5 @@ export default (pathTofile1, pathTofile2, formatName) => {
 
   return formatter.formatToString(differences, formatName);
 };
+
+export default genDiff;
