@@ -1,4 +1,7 @@
 import _ from 'lodash';
+import {
+  ADDED, REMOVED, CHANGED, NESTED,
+} from '../constants.js';
 
 const replacer = ' ';
 const replaceCount = 4;
@@ -35,15 +38,15 @@ const colToString = (collection) => {
     const result = col.flatMap(({
       key, type, value, oldValue, children,
     }) => {
-      if (type === 'removed') return `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`;
-      if (type === 'added') return `${opIndent}+ ${key}: ${convertObjToString(value, indent)}`;
-      if (type === 'changed') {
+      if (type === REMOVED) return `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`;
+      if (type === ADDED) return `${opIndent}+ ${key}: ${convertObjToString(value, indent)}`;
+      if (type === CHANGED) {
         return [
           `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`,
           `${opIndent}+ ${key}: ${convertObjToString(value, indent)}`,
         ];
       }
-      if (type === 'nested') return `${indent}${key}: ${iter(children, step + 1)}`;
+      if (type === NESTED) return `${indent}${key}: ${iter(children, step + 1)}`;
       return `${indent}${key}: ${convertObjToString(value, indent)}`;
     });
 

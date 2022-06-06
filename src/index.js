@@ -1,6 +1,9 @@
 import _ from 'lodash';
 import fileUtils from './file_utils.js';
 import formatter from './formatters/index.js';
+import {
+  ADDED, REMOVED, CHANGED, NESTED, UNCHANGED,
+} from './constants.js';
 
 const createDiffCol = (firstObject, secondObject) => {
   const agregatedKeys = _.union(_.keys(firstObject), _.keys(secondObject));
@@ -10,15 +13,15 @@ const createDiffCol = (firstObject, secondObject) => {
       const firstValue = firstObject[key];
       const secondValue = secondObject[key];
 
-      if (secondValue === undefined) return { key, type: 'removed', oldValue: firstValue };
-      if (firstValue === undefined) return { key, type: 'added', value: secondValue };
-      if (firstValue === secondValue) return { key, type: 'unchanged', value: firstValue };
+      if (secondValue === undefined) return { key, type: REMOVED, oldValue: firstValue };
+      if (firstValue === undefined) return { key, type: ADDED, value: secondValue };
+      if (firstValue === secondValue) return { key, type: UNCHANGED, value: firstValue };
       if (_.isObject(firstValue) && _.isObject(secondValue)) {
-        return { key, type: 'nested', children: createDiffCol(firstValue, secondValue) };
+        return { key, type: NESTED, children: createDiffCol(firstValue, secondValue) };
       }
 
       return {
-        key, type: 'changed', oldValue: firstValue, value: secondValue,
+        key, type: CHANGED, oldValue: firstValue, value: secondValue,
       };
     });
 };

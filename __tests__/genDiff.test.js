@@ -16,7 +16,7 @@ const plainResult = `{
   + verbose: true
 }`;
 
-test('genDiff compare plain JSON files', () => {
+test('genDiff compare plain JSON files, stylish format', () => {
   const firstFilePath = getFixturePath('test1_1.json');
   const secondFilePath = getFixturePath('test1_2.json');
   expect(genDiff(firstFilePath, secondFilePath)).toEqual(plainResult);
