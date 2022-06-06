@@ -38,7 +38,7 @@ const collectionToString = (collection) => {
     const result = col.flatMap(({
       key, type, value, oldValue, children,
     }) => {
-      if (type === REMOVED) return `${opIndent}- ${key}: ${convertObjToString(oldValue, indent)}`;
+      if (type === REMOVED) return `${opIndent}- ${key}: ${convertObjToString(value, indent)}`;
       if (type === ADDED) return `${opIndent}+ ${key}: ${convertObjToString(value, indent)}`;
       if (type === CHANGED) {
         return [

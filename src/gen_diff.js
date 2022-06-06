@@ -13,7 +13,7 @@ const createDiffCol = (firstObject, secondObject) => {
       const firstValue = firstObject[key];
       const secondValue = secondObject[key];
 
-      if (secondValue === undefined) return { key, type: REMOVED, oldValue: firstValue };
+      if (secondValue === undefined) return { key, type: REMOVED, value: firstValue };
       if (firstValue === undefined) return { key, type: ADDED, value: secondValue };
       if (firstValue === secondValue) return { key, type: UNCHANGED, value: firstValue };
       if (_.isObject(firstValue) && _.isObject(secondValue)) {
