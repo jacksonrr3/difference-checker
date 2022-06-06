@@ -1,6 +1,9 @@
 import _ from 'lodash';
 import fileUtils from './file_utils.js';
-import formatter from './formatter/index.js';
+import formatter from './formatters/index.js';
+import {
+  ADDED, REMOVED, CHANGED, NESTED, UNCHANGED,
+} from './constants.js';
 
 const createDiffCol = (firstObject, secondObject) => {
   const agregatedKeys = _.union(_.keys(firstObject), _.keys(secondObject));
@@ -10,37 +13,26 @@ const createDiffCol = (firstObject, secondObject) => {
       const firstValue = firstObject[key];
       const secondValue = secondObject[key];
 
-      if (secondValue === undefined) {
-        return { key, type: 'remove', oldValue: firstValue };
-      }
-
-      if (firstValue === undefined) {
-        return { key, type: 'add', value: secondValue };
-      }
-
-      if (firstValue === secondValue) {
-        return { key, type: 'same', value: firstValue };
-      }
-
+      if (secondValue === undefined) return { key, type: REMOVED, oldValue: firstValue };
+      if (firstValue === undefined) return { key, type: ADDED, value: secondValue };
+      if (firstValue === secondValue) return { key, type: UNCHANGED, value: firstValue };
       if (_.isObject(firstValue) && _.isObject(secondValue)) {
-        return { key, type: 'nested', children: createDiffCol(firstValue, secondValue) };
+        return { key, type: NESTED, children: createDiffCol(firstValue, secondValue) };
       }
 
       return {
-        key, type: 'changed', oldValue: firstValue, value: secondValue,
+        key, type: CHANGED, oldValue: firstValue, value: secondValue,
       };
     });
 };
 
-export const genDiff = (pathTofile1, pathTofile2, format) => {
+export const genDiff = (pathTofile1, pathTofile2, formatName) => {
   const firstComparedObj = fileUtils.getObjectFromFile(pathTofile1);
   const secondComparedObj = fileUtils.getObjectFromFile(pathTofile2);
 
   const differences = createDiffCol(firstComparedObj, secondComparedObj);
 
-  const resultString = formatter.formatToString(differences, format);
-
-  return resultString;
+  return formatter.formatToString(differences, formatName);
 };
 
 export default {
