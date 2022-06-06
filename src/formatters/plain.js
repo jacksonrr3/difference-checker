@@ -1,4 +1,4 @@
-const colToString = (collection) => collection.map((el) => `${el}`);
+const colToString = (collection) => { };
 
 export default {
   colToString,
